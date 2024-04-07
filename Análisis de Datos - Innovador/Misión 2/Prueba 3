@@ -1,1 +1,102 @@
+# Actividad: Consultas SQL
+
+# 1. Ejecutar y revisar el resultado de las siguientes consultas: 
+
+SELECT * FROM Invoice;
+SELECT * FROM Employee;
+SELECT BILLINGCOUNTRY,
+  	COUNT(INVOICEID)
+  FROM INVOICE
+  GROUP BY 1 ORDER BY 2 DESC
+
+# 2. ¿Qué país tiene más facturas?
+
+# El país que tiene más facturas es Estados Unidos, con 91
+
+SELECT BillingCountry, 
+COUNT(invoiceId) AS Result FROM Invoice
+GROUP BY BillingCountry
+ORDER BY Result DESC;
+
+# 3. Se quiere promocionar un nuevo festival musical, para ello es necesario saber en qué ciudad hay más facturas (invoices). Determinar en qué ciudad la suma de facturas es la mayor.
+
+# Praga es la ciudad con una suma mayor en el total de sus facturas, con 90.24
+
+SELECT * FROM invoice 
+SELECT BillingCity AS ciudad, SUM(Total) AS SumaTotalFacturas
+FROM invoice GROUP BY BillingCity
+ORDER BY TotalFacturas DESC
+LIMIT 1
+
+# 4. Determinar quién es el mejor cliente (el que más ha gastado en el sistema)
+
+# El mejor cliente es el número 6, con 49.62 gastado 
+
+SELECT CustomerId, SUM(Total) AS TotalGastado
+FROM invoice GROUP BY CustomerId
+ORDER BY TotalGastado DESC
+LIMIT 1;
+
+# 5. Obtener una tabla con el correo, nombre y apellido de todas las personas que escuchan Rock. Retornar la lista por orden alfabético
+
+SELECT * FROM customer;
+SELECT * FROM invoice;
+SELECT * FROM invoiceline;
+SELECT * FROM track;
+SELECT * FROM genre;
+SELECT Email, FirstName, LastName FROM customer
+INNER JOIN invoice ON customer.CustomerId = invoice.CustomerId
+INNER JOIN invoiceline ON invoice.InvoiceId = invoiceline.InvoiceId
+INNER JOIN track ON invoiceline.TrackId = track.TrackId
+INNER JOIN genre ON track.GenreId = genre.GenreId
+WHERE genre.Name = 'Rock'
+GROUP BY customer.Email, customer.FirstName, customer.LastName
+ORDER BY customer.LastName, customer.FirstName; 
+
+# 6. Sacar una lista con todos los artistas que generan música rock
+
+SELECT * FROM artist; 
+SELECT artist.Name AS Artist_Name FROM artist
+INNER JOIN album ON artist.ArtistId = album.ArtistId
+INNER JOIN track ON album.AlbumId = track.AlbumId
+INNER JOIN genre ON track.GenreId = genre.GenreId
+WHERE genre.Name = 'Rock'
+ORDER BY artist.Name;
+
+# 7. Encontrar cuál es el artista que más ha ganado de acuerdo con el campo invoiceLines.
+
+# El artista que más ha ganado ha sido Iron Maiden, con 138.60
+
+SELECT artist.Name AS Artist_Name, 
+SUM(invoiceline.UnitPrice * invoiceline.Quantity) AS TotalGanado FROM artist
+INNER JOIN album ON artist.ArtistId = album.ArtistId
+INNER JOIN track ON album.AlbumId = track.AlbumId
+INNER JOIN invoiceline ON track.TrackId = invoiceline.TrackId
+GROUP BY artist.ArtistId
+ORDER BY TotalGanado DESC;
+
+# 8. Encontrar cuánto gastaron en total en Estados Unidos en compras
+
+# En Estados Unidos, se gastaron un total de 523,06 
+
+# 9. Encontrar cuánto gastaron los usuarios por género.
+
+SELECT Genre.Name AS Genero_Musical, 
+SUM(InvoiceLine.UnitPrice * InvoiceLine.Quantity) AS Total_Gastado
+FROM Invoice
+INNER JOIN InvoiceLine ON Invoice.InvoiceId = InvoiceLine.InvoiceId
+INNER JOIN Track ON InvoiceLine.TrackId = Track.TrackId
+INNER JOIN Genre ON Track.GenreId = Genre.GenreId
+GROUP BY Genre.Name;
+
+# 10. Generar una tabla con el conteo de usuarios por cada país.
+
+SELECT Country, COUNT(*) AS Cantidad FROM Customer
+GROUP BY Country;
+
+# 11. Encontrar cuántas canciones hay por cada género.
+
+SELECT Genre.Name AS Genero, COUNT(*) AS Cantidad_Canciones FROM Track
+INNER JOIN Genre ON Track.GenreId = Genre.GenreId
+GROUP BY Genre.Name;
 
