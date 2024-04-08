@@ -1,4 +1,4 @@
-# Actividad inventario
+# Actividad inventario 
 
 CREATE TABLE `inventario` (`id_libro` INTEGER PRIMARY KEY AUTO_INCREMENT,
 						   `nombre` VARCHAR(100),
