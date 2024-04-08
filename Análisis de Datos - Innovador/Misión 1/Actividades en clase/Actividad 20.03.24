@@ -20,7 +20,7 @@ CREATE TABLE `proveedor` (`id_proveedor` INTEGER PRIMARY KEY AUTO_INCREMENT,
                           `cantidad` INTEGER,
 						  `id_libro2` INTEGER, 
 						  FOREIGN KEY (`id_libro2`) REFERENCES `inventario`(`id_libro`)
-)
+);
 
 SELECT * FROM inventario;
 
@@ -52,3 +52,14 @@ INSERT INTO proveedor (numero_pedido, cantidad, id_libro2) VALUES (100, 3, 2);
 INSERT INTO proveedor (numero_pedido, cantidad, id_libro2) VALUES (101, 4, 7);
 
 SELECT * FROM proveedor;
+
+SELECT * FROM inventario
+INNER JOIN ventas ON inventario.id_libro = ventas.id_libro1
+INNER JOIN proveedor ON inventario.id_libro = proveedor.id_libro2;
+
+SELECT * FROM inventario;
+
+DELETE FROM inventario WHERE id_libro = '1';
+ALTER TABLE inventario DROP COLUMN ano;
+
+SELECT * FROM inventario;
