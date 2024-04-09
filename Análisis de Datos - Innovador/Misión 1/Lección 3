@@ -1,4 +1,4 @@
-# Geolocalización
+# Mapa de precios de gasolina en Colombia
 
 PS C:\Users\USUARIO\Desktop\TT\AD\docker docker run -p 8888:8888  geopandas_img
 
@@ -163,4 +163,35 @@ Executing the command: jupyter lab
 [I 2024-04-08 22:10:47.724 ServerApp] Connecting to kernel e4115897-ef9a-4ac0-a1b7-5b7d2fca41ef.
 [I 2024-04-08 22:12:44.889 ServerApp] Saving file at /Untitled.ipynb
 [I 2024-04-08 22:14:44.939 ServerApp] Saving file at /Untitled.ipynb
+
+# Importar en jypiter notebook
+
+import geopandas as gpd
+import numpy as np 
+import matplotlib.pyplot as plt 
+import shapely as shp 
+import pandas as pd
+
+ruta_municipios = 'municipios.geojson'
+ruta_precios = 'precios_combustible.csv'
+
+precios = gpd.read_file(ruta_precios)
+shapes = gpd.read_file(ruta_municipios)
+
+shapes.plot()
+
+# Listar los productos para escoger uno
+precios["producto"].unique()
+precios_gasolina = precios[precios["producto"] == "GASOLINA CORRIENTE OXIGENADA"] # filtrar por producto
+print(len(precios_gasolina))
+precios_gasolina.head()
+
+precios_agrupados = precios_gasolina.groupby("municipionombre", as_index=False)["precio"].agg(["max"])
+precios_mapa = shapes.merge(precios_agrupados, right_on="municipionombre",left_on="MPIO_CNMBR")
+
+# Dibujar sobre el mapa 
+axis = shapes["geometry"].plot(figsize=(20, 12))
+precios_mapa["max"] = precios_mapa["max"].apply(lambda x: int(x))
+precios_mapa.plot(column="max", ax=axis, legend=True, scheme="Quantiles", k=10, cmap="gist_rainbow")
+axis.set_title("Precios de gasolina 2018")
 
