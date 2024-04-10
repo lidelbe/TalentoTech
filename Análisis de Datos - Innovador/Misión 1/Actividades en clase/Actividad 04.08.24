@@ -1,0 +1,12 @@
+# Equivalencias entre SQL y PANDAS
+
+| Consulta                                   | SQL                                                       | Pandas                                                                                           |
+|--------------------------------------------|-----------------------------------------------------------|--------------------------------------------------------------------------------------------------|
+| Selección de todas las filas              | `SELECT * FROM tabla;`                                    | `df`                                                                                             |
+| Selección de columnas específicas         | `SELECT columna1, columna2 FROM tabla;`                   | `df[['columna1', 'columna2']]`                                                                  |
+| Selección de todas las filas con una condición | `SELECT * FROM tabla WHERE condicion;`               | `df[df['condicion']]`                                                                           |
+| Ordenar resultados                        | `SELECT * FROM tabla ORDER BY columna ASC|DESC;`          | `df.sort_values(by='columna', ascending=True|False)`                                              |
+| Filtrado de filas basado en múltiples condiciones | `SELECT * FROM tabla WHERE condicion1 AND condicion2;` | `df[(df['condicion1']) & (df['condicion2'])]`                                                     |
+| Filtrado de filas basado en una lista de valores | `SELECT * FROM tabla WHERE columna IN (valor1, valor2, ...);` | `df[df['columna'].isin([valor1, valor2, ...])]`                                               |
+| Selección de filas basadas en valores nulos o no nulos | `SELECT * FROM tabla WHERE columna IS NULL;` | `df[df['columna'].isnull()]` <br> `SELECT * FROM tabla WHERE columna IS NOT NULL;`<br>`df[df['columna'].notnull()]` |
+| JOIN                                       | `SELECT * FROM tabla1 INNER JOIN tabla2 ON tabla1.columna = tabla2.columna;` | `pd.merge(tabla1, tabla2, on='columna', how='inner')`                                            |
