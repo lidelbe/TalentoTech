@@ -1,12 +1,152 @@
 # Equivalencias entre SQL y PANDAS
 
-| Consulta                                   | SQL                                                       | Pandas                                                                                           |
-|--------------------------------------------|-----------------------------------------------------------|--------------------------------------------------------------------------------------------------|
-| Selección de todas las filas              | `SELECT * FROM tabla;`                                    | `df`                                                                                             |
-| Selección de columnas específicas         | `SELECT columna1, columna2 FROM tabla;`                   | `df[['columna1', 'columna2']]`                                                                  |
-| Selección de todas las filas con una condición | `SELECT * FROM tabla WHERE condicion;`               | `df[df['condicion']]`                                                                           |
-| Ordenar resultados                        | `SELECT * FROM tabla ORDER BY columna ASC|DESC;`          | `df.sort_values(by='columna', ascending=True|False)`                                              |
-| Filtrado de filas basado en múltiples condiciones | `SELECT * FROM tabla WHERE condicion1 AND condicion2;` | `df[(df['condicion1']) & (df['condicion2'])]`                                                     |
-| Filtrado de filas basado en una lista de valores | `SELECT * FROM tabla WHERE columna IN (valor1, valor2, ...);` | `df[df['columna'].isin([valor1, valor2, ...])]`                                               |
-| Selección de filas basadas en valores nulos o no nulos | `SELECT * FROM tabla WHERE columna IS NULL;` | `df[df['columna'].isnull()]` <br> `SELECT * FROM tabla WHERE columna IS NOT NULL;`<br>`df[df['columna'].notnull()]` |
-| JOIN                                       | `SELECT * FROM tabla1 INNER JOIN tabla2 ON tabla1.columna = tabla2.columna;` | `pd.merge(tabla1, tabla2, on='columna', how='inner')`                                            |
+# 1. Consulta: Selección de todas las filas
+# SQL:
+SELECT *
+FROM tabla;
+# Pandas:
+df
+
+# 2. Consulta: Selección de columnas específicas
+# SQL:
+SELECT columna1, columna2
+FROM tabla;
+# Pandas:
+df[['columna1', 'columna2']]
+
+# 3. Consulta: Selección de todas las filas con una condición
+# SQL:
+SELECT *
+FROM tabla
+WHERE condicion;
+# Pandas:
+df[df['condicion']]
+
+# 4. Consulta: Ordenar resultados
+# SQL:
+SELECT *
+FROM tabla
+ORDER BY columna ASC|DESC;
+# Pandas:
+df.sort_values(by='columna', ascending=True|False)
+
+# 5. Consulta: Filtrado de filas basado en múltiples condiciones
+# SQL:
+SELECT *
+FROM tabla
+WHERE condicion1 AND condicion2;
+# Pandas:
+df[(df['condicion1']) & (df['condicion2'])]
+
+# 6. Consulta: Filtrado de filas basado en una lista de valores
+# SQL:
+SELECT *
+FROM tabla
+WHERE columna IN (valor1, valor2, ...);
+# Pandas:
+df[df['columna'].isin([valor1, valor2, ...])]
+
+# 7. Consulta: Selección de filas basadas en valores nulos o no nulos
+# SQL:
+SELECT *
+FROM tabla
+WHERE columna IS NULL;
+# Pandas:
+df[df['columna'].isnull()]
+
+# SQL:
+SELECT *
+FROM tabla
+WHERE columna IS NOT NULL;
+# Pandas:
+df[df['columna'].notnull()]
+
+# 8. Consulta: JOIN
+# SQL:
+SELECT *
+FROM tabla1
+INNER JOIN tabla2
+ON tabla1.columna = tabla2.columna;
+# Pandas:
+pd.merge(tabla1, tabla2, on='columna', how='inner')
+
+
+# Equivalencias SQL a PANDAS, con Data set de ligas de futbol 
+
+
+# 1. Descripción: Obtener todos los equipos de una liga específica
+# SQL:
+SELECT *
+FROM Team
+WHERE league_id = 'SP1';
+# PANDAS:
+import pandas as pd
+
+# Cargando el dataset
+df_teams = pd.read_csv('soccer_database.csv')
+
+# Filtrando los equipos de una liga específica
+teams_in_league = df_teams[df_teams['league_id'] == 'SP1']
+print(teams_in_league)
+
+
+# 2. Descripción: Contar el número de jugadores por equipo
+# SQL:
+SELECT team_long_name, COUNT(player_api_id) AS num_players
+FROM Player
+GROUP BY team_long_name;
+# PANDAS:
+# Cargando el dataset
+df_players = pd.read_csv('soccer_database.csv')
+
+# Contando el número de jugadores en cada equipo
+player_count_per_team = df_players.groupby('team_long_name')['player_api_id'].count().reset_index()
+player_count_per_team.columns = ['team_long_name', 'num_players']
+print(player_count_per_team)
+
+
+# 3. Descripción: Encontrar el jugador con mayor salario
+# SQL:
+SELECT player_name, MAX(salary) AS max_salary
+FROM Player;
+# PANDAS:
+# Cargando el dataset
+df_players = pd.read_csv('soccer_database.csv')
+
+# Encontrando el jugador con el mayor salario
+max_salary_player = df_players.loc[df_players['salary'].idxmax(), ['player_name', 'salary']]
+print(max_salary_player)
+
+
+# 4. Descripción: Cantidad promedio de goles por partido en cada liga
+# SQL:
+SELECT league_id, AVG(home_team_goal + away_team_goal) AS avg_goals
+FROM Match
+GROUP BY league_id;
+# PANDAS:
+# Cargando el dataset
+df_matches = pd.read_csv('soccer_database.csv')
+
+# Calculando la cantidad promedio de goles por partido en cada liga
+avg_goals_per_league = df_matches.groupby('league_id').apply(lambda x: (x['home_team_goal'] + x['away_team_goal']).mean()).reset_index()
+avg_goals_per_league.columns = ['league_id', 'avg_goals']
+print(avg_goals_per_league)
+
+
+# 5. Descripción: 10 equipos con mayor diferencia de goles en una temporada específica
+# SQL:
+SELECT team_long_name, (home_team_goal - away_team_goal) AS goal_diff
+FROM Match
+WHERE season = '2015/2016'
+ORDER BY goal_diff DESC
+LIMIT 10;
+# PANDAS:
+# Cargando el dataset
+df_matches = pd.read_csv('soccer_database.csv')
+
+# Filtrando y ordenando los equipos con la mayor diferencia de goles en una temporada específica
+top_goal_diff_teams = df_matches[df_matches['season'] == '2015/2016'].copy()
+top_goal_diff_teams['goal_diff'] = top_goal_diff_teams['home_team_goal'] - top_goal_diff_teams['away_team_goal']
+top_goal_diff_teams = top_goal_diff_teams[['home_team_long_name', 'goal_diff']].rename(columns={'home_team_long_name': 'team_long_name'})
+top_goal_diff_teams = top_goal_diff_teams.sort_values(by='goal_diff', ascending=False).head(10)
+print(top_goal_diff_teams)
