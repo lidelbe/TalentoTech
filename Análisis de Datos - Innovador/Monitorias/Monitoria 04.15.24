@@ -1,0 +1,58 @@
+# Limpieza de datos 
+
+import pandas as pd
+import numpy as np
+
+data_path = "/content/dataset_banco.csv"
+data = pd.read_csv(data_path)
+
+print(data.shape)
+
+data.head()
+
+print(data)
+
+# Elimina la fila completa donde hay datos faltantes 
+data.dropna (inplace=True)
+
+# Conteo de subniveles por columna
+cols_cat = ['job', 'marital', 'education', 'default', 'housing', 'loan', 'contact', 'month', 'poutcome', 'y']
+for col in cols_cat:
+  print(f'columna {col}: {data[col].nunique()} subniveles')
+
+data.describe()
+
+# Filas repetidas 
+print(f'Tamaño del set antes de eliminar las filas repetidas: {data.shape}')
+
+# Elimina filas con datos duplicados 
+data.drop_duplicates(inplace=True)
+
+print(f'Tamaño del set despues de eliminar las filas repetidas: {data.shape}')
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Valores extremos 
+cols_num = ['age', 'balance', 'day', 'duration', 'campaign', 'pdays', 'previous']
+fig, ax = plt.subplots(nrows=7, ncols=1, figsize=(8,30))
+fig.subplots_adjust(hspace=0.5)
+
+# Gráfico
+for i, col in enumerate(cols_num):
+  sns.boxplot(x=col, data=data, ax=ax[i])
+  ax[i].set_title(col)
+
+# Eliminar datos átipicos 
+
+print(f'Tamaño del set antes de eliminar registros de edad: {data.shape}')
+data = data[data['age']<100]
+print(f'Tamaño del set despúes de eliminar registros átipicos de edad: {data.shape}')
+
+print(f'Tamaño del set antes de eliminar registros átipicos de duración de la llamada: {data.shape}')
+data = data[data['duration']>0]
+print(f'Tamaño del set despúes de eliminar registros átipicos de duración de la llamada: {data.shape}')
+
+print(f'Tamaño del set antes de eliminar registros previos: {data.shape}')
+data = data[data['previous']<=100]
+print(f'Tamaño del set despúes de eliminar registros previos: {data.shape}')
