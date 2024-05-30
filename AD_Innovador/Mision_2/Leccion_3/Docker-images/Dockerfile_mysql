@@ -1,3 +1,0 @@
-FROM mysql:8.0.36-debian
-
-# aca la base de datos con los datos a cargar desde el CSV
